@@ -11,8 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { Plus, Refresh, Grape, MapLocation, TrendCharts, Money } from '@element-plus/icons-vue'
+// 暫時空置 - 待實作通知功能
 
 </script>
 

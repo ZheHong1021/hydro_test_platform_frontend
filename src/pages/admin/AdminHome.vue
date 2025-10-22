@@ -14,7 +14,7 @@
           {{ item.title }}:
         </el-col>
         <el-col :span="8">
-          <el-input v-model="formData[item.key]" size="large" :suffix="item.unit" placeholder="請輸入數值" />
+          <el-input v-model="formData[item.key as keyof FormData]" size="large" :suffix="item.unit" placeholder="請輸入數值" />
         </el-col>
         <el-col :span="2">
           {{ item.unit }}
@@ -27,9 +27,18 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { Plus, Refresh, Grape, MapLocation, TrendCharts, Money } from '@element-plus/icons-vue'
 
-const formData = ref({
+interface FormData {
+  loadOutput: number | null
+  currentPosition: number | null
+  loadPressureA: number | null
+  loadPressureB: number | null
+  testObjectPressureA: number | null
+  testObjectPressureB: number | null
+  pumpPressure: number | null
+}
+
+const formData = ref<FormData>({
   loadOutput: null,
   currentPosition: null,
   loadPressureA: null,

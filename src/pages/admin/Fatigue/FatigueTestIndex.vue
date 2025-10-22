@@ -24,7 +24,7 @@
           {{ item.title }}:
         </el-col>
         <el-col :span="8">
-          <el-input v-model="formData[item.key]" size="large" placeholder="請輸入數值" />
+          <el-input v-model="formData[item.key as keyof typeof formData]" size="large" placeholder="請輸入數值" />
         </el-col>
         <el-col :span="2">
           {{ item.unit }}
@@ -37,7 +37,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { Plus, Refresh, Grape, MapLocation, TrendCharts, Money } from '@element-plus/icons-vue'
 
 const formData = ref({
   repeatCount: null,

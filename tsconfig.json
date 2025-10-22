@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": { // 編譯器選項
+    "types": ["element-plus/global" ] // 指定要包含在編譯中的類型定義文件
+  }
+}

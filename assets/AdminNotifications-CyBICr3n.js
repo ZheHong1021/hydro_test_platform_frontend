@@ -1,0 +1,1 @@
+import{d as s,c as o,a,o as t}from"./index-BrzNt4tH.js";const d={class:"admin-dashboard"},c=s({__name:"AdminNotifications",setup(n){return(r,e)=>(t(),o("div",d,[...e[0]||(e[0]=[a("div",{class:"dashboard-header"},[a("h1",null,"通知中心"),a("div",{class:"header-actions"})],-1)])]))}});export{c as default};

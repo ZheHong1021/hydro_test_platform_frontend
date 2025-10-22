@@ -1,0 +1,1 @@
+import{d as t,c as a,b as o,w as s,u as n,o as r,h as l,g as u}from"./index-BrzNt4tH.js";const _=t({__name:"UserList",setup(c){return(d,e)=>(r(),a("div",null,[o(n(u),null,{default:s(()=>[...e[0]||(e[0]=[l("Hello",-1)])]),_:1})]))}});export{_ as default};

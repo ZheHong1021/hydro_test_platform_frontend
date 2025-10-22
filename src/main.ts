@@ -14,7 +14,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn' // 中文語系
 const elementConfig = { 
-    size: 'medium', 
+    size: 'default' as const, 
     zIndex: 3000,
     locale: zhCn,
 }

@@ -25,7 +25,7 @@ export const router = createRouter({
 })
 
 // 路由守衛
-router.beforeEach((to, from, next) => {
+// router.beforeEach((to, from, next) => {
   // // 設置頁面標題
   // if (to.meta?.title) {
   //   document.title = `${to.meta.title} - 農業管理平台`
@@ -57,8 +57,8 @@ router.beforeEach((to, from, next) => {
     // }
   // }
 
-  next()
-})
+//   next()
+// })
 
 // 路由錯誤處理
 router.onError((error) => {

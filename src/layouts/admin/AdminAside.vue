@@ -31,9 +31,7 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   WarnTriangleFilled,
-  DataBoard,
-  Expand,
-  Fold
+  DataBoard
 } from '@element-plus/icons-vue'
 import MenuItems from './components/MenuItems.vue'
 
@@ -94,10 +92,6 @@ const menuItems = ref<MenuItem[]>([
   // },
 ])
 
-const toggleCollapse = () => {
-  isCollapsed.value = !isCollapsed.value
-}
-
 // 新增選單項目的方法
 const addMenuItem = (item: MenuItem) => {
   menuItems.value.push(item)
@@ -105,7 +99,7 @@ const addMenuItem = (item: MenuItem) => {
 
 // 移除選單項目的方法
 const removeMenuItem = (index: string) => {
-  const itemIndex = menuItems.value.findIndex(item => item.index === index)
+  const itemIndex = menuItems.value.findIndex((item: MenuItem) => item.index === index)
   if (itemIndex > -1) {
     menuItems.value.splice(itemIndex, 1)
   }
@@ -113,7 +107,7 @@ const removeMenuItem = (index: string) => {
 
 // 新增子選單項目的方法
 const addSubMenuItem = (parentIndex: string, subItem: MenuItem) => {
-  const parentItem = menuItems.value.find(item => item.index === parentIndex)
+  const parentItem = menuItems.value.find((item: MenuItem) => item.index === parentIndex)
   if (parentItem && parentItem.children) {
     parentItem.children.push(subItem)
   }

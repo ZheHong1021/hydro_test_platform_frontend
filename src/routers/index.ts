@@ -19,8 +19,11 @@ const routes: RouteRecordRaw[] = [
   }
 ]
 
+// 根據環境配置 base 路徑
+const base = process.env.NODE_ENV === 'production' ? '/hydro_test_platform_frontend/' : '/'
+
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(base),
   routes,
 })
 

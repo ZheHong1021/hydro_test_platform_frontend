@@ -52,12 +52,12 @@ watch(
   (newData) => {
     if (!newData) return;
     // 根據資料更新表單
-    formData.value.stroke = newData['stroke'] ?? null;
-    formData.value.press1_a = newData['press1_a'] ?? null;
-    formData.value.press1_b = newData['press1_b'] ?? null;
-    formData.value.press2_a = newData['press2_a'] ?? null;
-    formData.value.press2_b = newData['press2_b'] ?? null;
-    formData.value.press3 = newData['press3'] ?? null;
+    formData.value.stroke = newData['stroke'] ? Number(newData['stroke']) : null;
+    formData.value.press1_a = newData['press1_a'] ? Number(newData['press1_a']) : null;
+    formData.value.press1_b = newData['press1_b'] ? Number(newData['press1_b']) : null;
+    formData.value.press2_a = newData['press2_a'] ? Number(newData['press2_a']) : null;
+    formData.value.press2_b = newData['press2_b'] ? Number(newData['press2_b']) : null;
+    formData.value.press3 = newData['press3'] ? Number(newData['press3']) : null;
   },
   { deep: true } // 保證監聽陣列內部變化
 );

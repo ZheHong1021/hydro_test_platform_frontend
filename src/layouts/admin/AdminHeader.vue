@@ -107,8 +107,6 @@ import {
   Bell,
   ArrowDown,
   Sunny,
-  // User,
-  // SwitchButton,
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -162,23 +160,28 @@ const connectionStatusText = ref('未連線')
 // 連線方法
 const connect = async () => {
   try {
-    // 連接到 Web Serial API
-    const serial = navigator.serial;
+    // 若瀏覽器不支援 Web Serial API，提前返回
+    if (!('serial' in navigator)) {
+      ElMessage.warning('瀏覽器不支援 Web Serial API')
+      return
+    }
 
-    // 選擇目標 Serial Port
+    // 使用 Web Serial API 進行連線 (TS 需要型別斷言)
+    const serial = (navigator as any).serial
+
+    // 使用型別斷言避免 TS 錯誤
     const port = await serial.requestPort()
 
     // 打開連線 (baudRate 視設備而定)
     await port.open({ baudRate: 9600 })
 
-    // 3. 建立 reader 來接收資料
+    // 取得 reader
     const reader = port.readable.getReader()
 
     isConnected.value = true
     connectionStatusText.value = '已連線'
     ElMessage.success('連線成功')
 
-    // 4. 持續讀取資料
     while (true) {
       const { value, done } = await reader.read()
       if (done) break

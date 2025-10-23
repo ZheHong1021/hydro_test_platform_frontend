@@ -20,5 +20,12 @@ const elementConfig = {
 }
 app.use(ElementPlus, elementConfig)
 
+// Import Pinia store
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
+
 // Mount the app
 app.mount('#app')

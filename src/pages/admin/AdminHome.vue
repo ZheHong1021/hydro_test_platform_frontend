@@ -14,7 +14,7 @@
           {{ item.title }}:
         </el-col>
         <el-col :span="8">
-          <el-input v-model="formData[item.key as keyof FormData]" size="large" :suffix="item.unit" placeholder="請輸入數值" />
+          <el-input v-model="formData[item.key as keyof FormData]" size="large" :readonly="item.readonly"  />
         </el-col>
         <el-col :span="2">
           {{ item.unit }}
@@ -28,7 +28,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-interface FormData {
+interface FormData { // 定義表單資料結構
   loadOutput: number | null
   currentPosition: number | null
   loadPressureA: number | null
@@ -50,39 +50,46 @@ const formData = ref<FormData>({
 
 const formInputList = ref([
   {
-    title: "負載出力",
-    key: "loadOutput",
-    unit: "N"
+    title: "負載出力", // 對應標題
+    key: "loadOutput", // 對應 formData 的 key
+    unit: "N", // 顯示單位
+    readonly: true, // 全部都唯讀
   },
   {
-    title: "現在位置",
-    key: "currentPosition",
-    unit: "mm"
+    title: "現在位置", // 對應標題
+    key: "currentPosition", // 對應 formData 的 key
+    unit: "mm", // 顯示單位
+    readonly: true, // 全部都唯讀
   },
   {
-    title: "負載油壓A",
-    key: "loadPressureA",
-    unit: "psi"
+    title: "負載油壓A", // 對應標題
+    key: "loadPressureA", // 對應 formData 的 key
+    unit: "psi", // 顯示單位
+    readonly: true, // 全部都唯讀
   },
   {
-    title: "負載油壓B",
-    key: "loadPressureB",
-    unit: "psi"
+    title: "負載油壓B", // 對應標題
+    key: "loadPressureB", // 對應 formData 的 key
+    unit: "psi", // 顯示單位
+    readonly: true, // 全部都唯讀
   },
   {
-    title: "測物油壓A",
-    key: "testObjectPressureA",
-    unit: "psi"
+    title: "測物油壓A", // 對應標題
+    key: "testObjectPressure // 對應 formData 的 keyA",
+    unit: "psi", // 顯示單位
+    readonly: true, // 全部都唯讀
   },
   {
-    title: "測物油壓B",
-    key: "testObjectPressureB",
-    unit: "psi"
+    title: "測物油壓B", // 對應標題
+    key: "testObjectPressure // 對應 formData 的 keyB",
+    unit: "psi", // 顯示單位
+    readonly: true, // 全部都唯讀
   },
   {
-    title: "泵浦油壓",
-    key: "pumpPressure",
-    unit: "psi"
+    title: "泵浦油壓", // 對應標題
+    key: "pumpPressure", // 對應 formData 的 key
+    unit: "psi", // 顯示單位
+    readonly: true, // 全部都唯讀
   },
 ])
 

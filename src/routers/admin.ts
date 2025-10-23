@@ -20,17 +20,6 @@ export const adminRoutes: RouteRecordRaw[] = [
           roles: ['admin', 'manager']
         }
       },
-      // 儀表板
-      {
-        path: 'dashboard',
-        name: 'AdminDashboard',
-        component: loadView('admin/AdminDashboard'),
-        meta: {
-          title: '管理儀表板',
-          requiresAuth: true,
-          roles: ['admin', 'manager']
-        }
-      },
       // 通知中心
       {
         path: 'notifications',
@@ -63,70 +52,6 @@ export const adminRoutes: RouteRecordRaw[] = [
           requiresAuth: true
         }
       },
-
-      // // 作物管理
-      // {
-      //   path: 'crops',
-      //   redirect: '/admin/crops/list',
-      //   children: [
-      //     {
-      //       path: 'list',
-      //       name: 'AdminCropsList',
-      //       component: loadView('Home'), // 暫時使用Home
-      //       meta: {
-      //         title: '作物列表',
-      //         requiresAuth: true
-      //       }
-      //     },
-      //     {
-      //       path: 'add',
-      //       name: 'AdminCropsAdd',
-      //       component: loadView('Home'),
-      //       meta: {
-      //         title: '新增作物',
-      //         requiresAuth: true
-      //       }
-      //     },
-      //     {
-      //       path: 'edit/:id',
-      //       name: 'AdminCropsEdit',
-      //       component: loadView('Home'),
-      //       meta: {
-      //         title: '編輯作物',
-      //         requiresAuth: true
-      //       }
-      //     },
-      //     {
-      //       path: 'calendar',
-      //       name: 'AdminCropsCalendar',
-      //       component: loadView('Home'),
-      //       meta: {
-      //         title: '種植日曆',
-      //         requiresAuth: true
-      //       }
-      //     },
-      //     {
-      //       path: 'analysis',
-      //       name: 'AdminCropsAnalysis',
-      //       component: loadView('Home'),
-      //       meta: {
-      //         title: '作物分析',
-      //         requiresAuth: true
-      //       }
-      //     }
-      //   ]
-      // },
     ]
   },
-
-  // 後台登入頁面（不使用Layout）
-  {
-    path: '/admin/login',
-    name: 'AdminLogin',
-    component: loadView('Home'), // 暫時使用Home，後續建立登入頁面
-    meta: {
-      title: '後台登入',
-      hideInMenu: true
-    }
-  }
 ]

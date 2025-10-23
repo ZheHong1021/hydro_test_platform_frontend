@@ -82,7 +82,7 @@
             <el-icon class="dropdown-icon"><ArrowDown /></el-icon>
           </div>
           <template #dropdown>
-            <el-dropdown-menu>
+            <!-- <el-dropdown-menu>
               <el-dropdown-item 
                 v-for="action in userActions"
                 :key="action.command"
@@ -91,7 +91,7 @@
                 :divided="action.command === 'logout'">
                 {{ action.label }}
               </el-dropdown-item>
-            </el-dropdown-menu>
+            </el-dropdown-menu> -->
           </template>
         </el-dropdown>
       </div>
@@ -103,10 +103,8 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  Bell,
-  User,
   UserFilled,
-  SwitchButton,
+  Bell,
   ArrowDown,
   Sunny,
 } from '@element-plus/icons-vue'
@@ -116,9 +114,7 @@ const router = useRouter()
 
 const username = ref('系統管理員')
 
-// 連線狀態管理
-const isConnected = ref(false)
-const connectionStatusText = ref('未連線')
+
 
 const notifications = ref([
   {
@@ -138,10 +134,10 @@ const handleNotificationAction = (path: string) => {
 
 
 
-const userActions = ref([
-  { command: 'profile', label: '個人資料', icon: User },
-  { command: 'logout', label: '登出', icon: SwitchButton },
-])
+// const userActions = ref([
+//   { command: 'profile', label: '個人資料', icon: User },
+//   { command: 'logout', label: '登出', icon: SwitchButton },
+// ])
 
 const handleUserAction = (command: string) => {
   switch (command) {
@@ -155,12 +151,51 @@ const handleUserAction = (command: string) => {
   }
 }
 
+//#region (Web Serial API 相關)
+// 連線狀態管理
+const isConnected = ref(false)
+const connectionStatusText = ref('未連線')
+
+
 // 連線方法
-const connect = () => {
-  isConnected.value = true
-  connectionStatusText.value = '已連線'
-  ElMessage.success('連線成功')
+const connect = async () => {
+  try {
+    // 若瀏覽器不支援 Web Serial API，提前返回
+    if (!('serial' in navigator)) {
+      ElMessage.warning('瀏覽器不支援 Web Serial API')
+      return
+    }
+
+    // 使用 Web Serial API 進行連線 (TS 需要型別斷言)
+    const serial = (navigator as any).serial
+
+    // 使用型別斷言避免 TS 錯誤
+    const port = await serial.requestPort()
+
+    // 打開連線 (baudRate 視設備而定)
+    await port.open({ baudRate: 9600 })
+
+    // 取得 reader
+    const reader = port.readable.getReader()
+
+    isConnected.value = true
+    connectionStatusText.value = '已連線'
+    ElMessage.success('連線成功')
+
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) break
+      if (value) {
+        console.log('Received data:', new TextDecoder().decode(value))
+      }
+    }
+
+    reader.releaseLock()
+  } catch (err) {
+    console.error('連接失敗：', err)
+  }
 }
+
 
 // 中斷連線方法
 const disconnect = () => {
@@ -168,6 +203,9 @@ const disconnect = () => {
   connectionStatusText.value = '未連線'
   ElMessage.warning('連線已中斷')
 }
+//#endregion
+
+
 </script>
 
 <style scoped>

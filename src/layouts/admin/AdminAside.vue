@@ -3,14 +3,14 @@
     :width="isCollapsed ? '64px' : '240px'"
     class="admin-aside"
   >
-    <!-- <div class="aside-header">
+    <div class="aside-header">
       <el-button
         type="text"
         :icon="isCollapsed ? Expand : Fold"
         @click="toggleCollapse"
         class="collapse-btn"
       />
-    </div> -->
+    </div>
 
     <el-scrollbar class="aside-scrollbar">
       <el-menu
@@ -27,11 +27,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, markRaw } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   WarnTriangleFilled,
-  DataBoard
+  DataBoard,
+  Expand,
+  Fold
 } from '@element-plus/icons-vue'
 import MenuItems from './components/MenuItems.vue'
 
@@ -62,34 +64,23 @@ const activeMenu = computed(() => {
   return '/home'
 })
 
+// 切換側邊欄折疊狀態
+const toggleCollapse = () => {
+  isCollapsed.value = !isCollapsed.value
+}
+
 // 後台選單路由配置
 const menuItems = ref<MenuItem[]>([
   {
     index: '/home',
     title: '首頁',
-    icon: DataBoard
+    icon: markRaw(DataBoard) // <- markRaw 包裝
   },
   {
     index: '/fatigue-test',
     title: '疲勞測試',
-    icon: WarnTriangleFilled
+    icon: markRaw(WarnTriangleFilled) // <- markRaw 包裝
   },
-  // {
-  //   index: '/dashboard',
-  //   title: '管理儀表板',
-  //   icon: DataBoard
-  // },
-  // {
-  //   index: 'crops',
-  //   title: '作物管理',
-  //   icon: Grape,
-  //   children: [
-  //     { index: '/crops/list', title: '作物列表', icon: '' },
-  //     { index: '/crops/add', title: '新增作物', icon: '' },
-  //     { index: '/crops/calendar', title: '種植日曆', icon: '' },
-  //     { index: '/crops/analysis', title: '作物分析', icon: '' }
-  //   ]
-  // },
 ])
 
 // 新增選單項目的方法

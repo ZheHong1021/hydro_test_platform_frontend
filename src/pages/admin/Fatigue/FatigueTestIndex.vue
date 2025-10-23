@@ -24,7 +24,7 @@
           {{ item.title }}:
         </el-col>
         <el-col :span="8">
-          <el-input v-model="formData[item.key as keyof typeof formData]" size="large" placeholder="請輸入數值" />
+          <el-input v-model="formData[item.key as keyof typeof formData]" size="large" :readonly="item.readonly"/>
         </el-col>
         <el-col :span="2">
           {{ item.unit }}
@@ -48,12 +48,14 @@ const formInputList = ref([
   {
     title: "現在次數",
     key: "currentCount",
-    unit: "次"
+    unit: "次",
+    readonly: true, // 全部都唯讀
   },
   {
     title: "目標次數",
     key: "targetCount",
-    unit: "次"
+    unit: "次",
+    readonly: true, // 全部都唯讀
   },
 ])
 

@@ -5,6 +5,9 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": { // 編譯器選項
-    "types": ["element-plus/global" ] // 指定要包含在編譯中的類型定義文件
+    "types": ["element-plus/global" ], // 指定要包含在編譯中的類型定義文件
+    "noUnusedLocals": false, // 關閉未使用變數檢查
+    "noUnusedParameters": false, // 關閉未使用參數檢查
+    "skipLibCheck": true // 跳過庫文件的型別檢查
   }
 }

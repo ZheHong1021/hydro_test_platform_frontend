@@ -9,18 +9,18 @@
               <el-text size="small">連線狀態：</el-text>
               <el-text
                 size="small"
-                :type="isConnected ? 'success' : 'danger'"
+                :type="serial.isConnected ? 'success' : 'danger'"
                 tag="strong"
               >
-                {{ connectionStatusText }}
+                {{ serial.isConnected ? '已連線' : '未連線' }}
               </el-text>
             </el-space>
             <el-space :size="8">
               <el-button
                 type="primary"
                 size="small"
-                @click="connect"
-                :disabled="isConnected"
+                @click="onConnect"
+                :disabled="serial.isConnected"
                 plain
               >
                 連線
@@ -28,8 +28,8 @@
               <el-button
                 type="danger"
                 size="small"
-                @click="disconnect"
-                :disabled="!isConnected"
+                @click="onDisconnect"
+                :disabled="!serial.isConnected"
                 plain
               >
                 中斷
@@ -109,6 +109,7 @@ import {
   Sunny,
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { useSerialStore } from '@/stores/serial';
 
 const router = useRouter()
 
@@ -153,55 +154,17 @@ const handleUserAction = (command: string) => {
 
 //#region (Web Serial API 相關)
 // 連線狀態管理
-const isConnected = ref(false)
-const connectionStatusText = ref('未連線')
-
+const serial = useSerialStore();
 
 // 連線方法
-const connect = async () => {
-  try {
-    // 若瀏覽器不支援 Web Serial API，提前返回
-    if (!('serial' in navigator)) {
-      ElMessage.warning('瀏覽器不支援 Web Serial API')
-      return
-    }
-
-    // 使用 Web Serial API 進行連線 (TS 需要型別斷言)
-    const serial = (navigator as any).serial
-
-    // 使用型別斷言避免 TS 錯誤
-    const port = await serial.requestPort()
-
-    // 打開連線 (baudRate 視設備而定)
-    await port.open({ baudRate: 9600 })
-
-    // 取得 reader
-    const reader = port.readable.getReader()
-
-    isConnected.value = true
-    connectionStatusText.value = '已連線'
-    ElMessage.success('連線成功')
-
-    while (true) {
-      const { value, done } = await reader.read()
-      if (done) break
-      if (value) {
-        console.log('Received data:', new TextDecoder().decode(value))
-      }
-    }
-
-    reader.releaseLock()
-  } catch (err) {
-    console.error('連接失敗：', err)
-  }
+const onConnect = async () => {
+    await serial.connect()
 }
 
 
 // 中斷連線方法
-const disconnect = () => {
-  isConnected.value = false
-  connectionStatusText.value = '未連線'
-  ElMessage.warning('連線已中斷')
+const onDisconnect = async () => {
+    await serial.disconnect();
 }
 //#endregion
 

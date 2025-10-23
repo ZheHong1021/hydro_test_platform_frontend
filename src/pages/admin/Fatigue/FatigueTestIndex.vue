@@ -85,7 +85,7 @@ watch(
   (newData) => {
     if (!newData) return;
     // 根據資料更新表單
-    currentCount.value = newData['test_no'] ?? null;
+    currentCount.value = newData['test_no'] ? Number(newData['test_no']) : null;
   },
   { deep: true } // 保證監聽陣列內部變化
 );

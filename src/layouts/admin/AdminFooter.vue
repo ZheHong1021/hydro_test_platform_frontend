@@ -14,7 +14,7 @@
         <el-divider direction="vertical" />
 
         <div class="performance-info">
-          <span class="performance-item">時間: {{ currentTime }} (抓取本機時間)</span>
+          <span class="performance-item">時間: {{ currentTime }}</span>
         </div>
       </div>
     </div>

@@ -37,8 +37,6 @@ import { useSerialStore } from '@/stores/serial';
 // 連線狀態管理
 const serial = useSerialStore();
 
-// const saveReceivedData = ref<(number | null)[]>([]); // 儲存接收到的資料陣列
-
 watch( // 監聽連線狀態變化
   () => serial.isConnected,
   (connected) => {
@@ -68,14 +66,12 @@ watch(
 const sendSerialPage = async () => {
   if(serial.isConnected){
     await serial.send("SET_PAGE,0") // 如果有連線，設定頁面為 0
-    serial.readLoop();
   }
 }
 
 const sendSerialButton = async (no: number) => {
   if(serial.isConnected){
-    await serial.send(`SET_BUTTON,${no}`) // 如果有連線，設定計數為 0
-    serial.readLoop();
+    await serial.send(`SET_BUTTON,${no}`) // 如果有連線，設定按鈕指令
   }
 }
 

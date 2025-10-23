@@ -92,21 +92,35 @@ watch(
 
 const sendSerialPage = async () => {
   if(serial.isConnected){
-    await serial.send("SET_PAGE,1") // 如果有連線，設定頁面為 0
-    serial.readLoop();
+    await serial.send("SET_PAGE,1") // 如果有連線，設定頁面為 1
   }
 }
 
 const sendSerialCount = async (no: number) => {
-  if(serial.isConnected){
-    await serial.send(`SET_COUNT,${no},${repeatCount.value}`) // 如果有連線，設定計數為 0
-    serial.readLoop();
+  if(!serial.isConnected){
+    return;
   }
+
+  // 驗證 repeatCount 是否為有效數字
+  const count = Number(repeatCount.value);
+  if (isNaN(count) || count <= 0) {
+    console.warn('循環次數必須為有效的正整數');
+    return;
+  }
+
+  await serial.send(`SET_COUNT,${no},${count}`);
 }
 
 const onStart = () => { // 開始
-  fatigue.setRepeatCount(repeatCount.value); // 儲存到 store
-  targetCount.value = repeatCount.value;
+  // 驗證 repeatCount 是否為有效數字
+  const count = Number(repeatCount.value);
+  if (isNaN(count) || count <= 0) {
+    console.warn('請輸入有效的循環次數');
+    return;
+  }
+
+  fatigue.setRepeatCount(count); // 儲存到 store
+  targetCount.value = count;
   sendSerialCount(0);
 }
 

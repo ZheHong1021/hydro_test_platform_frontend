@@ -37,9 +37,9 @@
             </el-space>
           </el-space>
         </div>
-        <div class="logo">
-          <h2>油壓測試平台</h2>
-        </div>
+      </div>
+      <div class="logo">
+        <h2>油壓測試平台</h2>
       </div>
       <div class="header-right">
         
@@ -198,7 +198,7 @@ const onDisconnect = async () => {
   margin: 0;
   color: var(--el-color-primary);
   font-weight: 600;
-  font-size: 18px;
+  font-size: 1.75rem;
 }
 
 

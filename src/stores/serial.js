@@ -10,6 +10,8 @@ export const useSerialStore = defineStore('serial', () => {
   let reader = null;
   let writer = null;
   let isReading = false; // 🔹 防止重複啟動 readLoop
+  let writableStreamClosed = null; // 保存寫入流的 Promise
+  let readableStreamClosed = null; // 保存讀取流的 Promise
 
   /** 連線 */
   const connect = async () => {
@@ -22,19 +24,21 @@ export const useSerialStore = defineStore('serial', () => {
       port.value = await navigator.serial.requestPort();
       await port.value.open({ 
         baudRate: 9600, // 根據需求調整
-        // bufferSize: 1024, // 緩衝區大小
       });
 
       // 設定寫入器
       const textEncoder = new TextEncoderStream();
 
-      const writableStreamClosed = textEncoder.readable.pipeTo(port.value.writable);
+      writableStreamClosed = textEncoder.readable.pipeTo(port.value.writable);
 
       // 取得 writer(用於傳送資料)
       writer = textEncoder.writable.getWriter();
 
       isConnected.value = true;
       ElMessage.success('接口連線成功');
+
+      // 連線成功後立即啟動讀取循環
+      readLoop();
 
       navigator.serial.addEventListener('disconnect', () => {
         isConnected.value = false;
@@ -53,20 +57,26 @@ export const useSerialStore = defineStore('serial', () => {
       ElMessage.warning('尚未連線');
       return;
     }
+
     if (isReading) {
       return;
     }
 
+
     isReading = true;
     const textDecoder = new TextDecoderStream();
-    const readableStreamClosed = port.value.readable.pipeTo(textDecoder.writable);
+    readableStreamClosed = port.value.readable.pipeTo(textDecoder.writable);
     reader = textDecoder.readable.getReader();
+
 
     let buffer = ''; // 暫存資料片段
 
     try {
       while (port.value?.readable) {
-        const { value, done } = await reader.read();
+        console.log("我有顯示")
+        const response = await reader.read();
+        console.log("我沒有顯示")
+        const { value, done } = response;
         if (done) break; // 如果已經捕捉完畢
         if (!isConnected.value) break; // 如果斷開連線
 
@@ -78,14 +88,17 @@ export const useSerialStore = defineStore('serial', () => {
           buffer = lines.pop(); // 保留未完整的一段（可能被切開）
 
           for (const line of lines) {
+            console.log("✅ 接收資料:", line);
             if (line.trim() !== '') {
               const values = line.split(':').map(v => v.trim());
-              if(values.length !== 2) {
-                console.warn("資料格式錯誤，無法解析:", line);
-                continue;
+              if(values.length === 2) {
+                // 使用展開運算子建立新物件，強制觸發 Vue 響應式更新
+                receivedData.value = { ...receivedData.value, [values[0]]: values[1] };
               }
-              
-              receivedData.value[values[0]] = values[1];
+              else{
+                console.warn("資料格式錯誤，無法解析:", line);
+              }
+
             }
           }
         }
@@ -108,7 +121,8 @@ export const useSerialStore = defineStore('serial', () => {
     try {
       console.log("📤 傳送資料:", data);
       await writer.write(data + '\n');
-    } 
+      // readLoop 已在 connect 時啟動，無需重複調用
+    }
     catch (err) {
       console.error('寫入失敗:', err);
       ElMessage.error('❌ 串口寫入失敗，請重新連線');
@@ -134,36 +148,39 @@ export const useSerialStore = defineStore('serial', () => {
 
       // 停止寫入
       if (writer) {
-        console.log("⏹️ 釋放 writer");
+        console.log("⏹️ 關閉 writer");
         try {
-          await writer.close?.();
+          await writer.close();
         } catch (_) {
           /* 某些瀏覽器不支援 close() */
         }
-        writer.releaseLock?.();
+        writer.releaseLock();
         writer = null;
       }
 
-      // 等待解鎖 decoder/encoder stream
-      if (port.value?.readable) {
+      // 等待 pipeTo 完成
+      if (readableStreamClosed) {
         try {
-          await port.value.readable.cancel();
-        } catch (_) { }
-        // 等待管線解除鎖定
-        await new Promise(r => setTimeout(r, 100));
+          await readableStreamClosed;
+        } catch (_) {
+          /* Stream 可能已被取消 */
+        }
+        readableStreamClosed = null;
       }
 
-      if (port.value?.writable) {
+      if (writableStreamClosed) {
         try {
-          await port.value.writable.abort();
-        } catch (_) { }
-        await new Promise(r => setTimeout(r, 100));
+          await writableStreamClosed;
+        } catch (_) {
+          /* Stream 可能已被取消 */
+        }
+        writableStreamClosed = null;
       }
 
       // 關閉 Port
       if (port.value && typeof port.value.close === "function") {
         console.log("🧹 關閉 SerialPort");
-        await port.value.close(); // 🔥 這裡現在不會報 locked stream
+        await port.value.close();
       }
 
       console.log("✅ 接口已安全關閉");

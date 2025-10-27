@@ -46,7 +46,7 @@ export const useSerialStore = defineStore('serial', () => {
 
       (navigator as any).serial.addEventListener('disconnect', () => {
         isConnected.value = false;
-        ElMessage.warning('⚠️ 串口設備已拔除');
+        ElMessage.warning('串口設備已拔除');
       });
 
     } catch (err) {
@@ -63,9 +63,11 @@ export const useSerialStore = defineStore('serial', () => {
     }
 
     if (isReading) {
+      console.log("⚠️ readLoop 已在運行中，跳過重複啟動");
       return;
     }
 
+    console.log("🔄 readLoop 開始執行");
     isReading = true;
     const textDecoder = new TextDecoderStream();
     readableStreamClosed = port.value!.readable.pipeTo(textDecoder.writable);
@@ -75,36 +77,47 @@ export const useSerialStore = defineStore('serial', () => {
 
     try {
       while (port.value?.readable) {
-        console.log("我有顯示")
+        console.log("⏳ 等待串口資料...")
         const response = await reader.read();
-        console.log("我沒有顯示")
+        console.log("📥 收到串口回應:", response)
         const { value, done } = response;
-        if (done) break; // 如果已經捕捉完畢
-        if (!isConnected.value) break; // 如果斷開連線
+        if (done) {
+          console.log("🛑 串口讀取已完成 (done=true)");
+          break;
+        }
+        if (!isConnected.value) {
+          console.log("🔌 串口已斷線，停止讀取");
+          break;
+        }
 
         if (value) {
+          console.log("📝 原始資料片段:", JSON.stringify(value));
           buffer += value; // 累加字串
 
           // 當遇到換行符號（\r\n 或 \n），表示一筆完整資料
           let lines = buffer.split(/\r?\n/);
           buffer = lines.pop() || ''; // 保留未完整的一段（可能被切開）
+          console.log(`📋 解析出 ${lines.length} 行資料，緩衝區剩餘: ${JSON.stringify(buffer)}`);
 
           for (const line of lines) {
-            console.log("✅ 接收資料:", line);
+            console.log("✅ 接收完整資料行:", line);
             if (line.trim() !== '') {
               const values = line.split(':').map(v => v.trim());
               if(values.length === 2 && values[0] && values[1]) {
                 // 使用展開運算子建立新物件，強制觸發 Vue 響應式更新
                 const key: string = values[0];
                 const val: string = values[1];
+                console.log(`💾 儲存資料: ${key} = ${val}`);
                 receivedData.value = { ...receivedData.value, [key]: val };
               }
               else{
-                console.warn("資料格式錯誤，無法解析:", line);
+                console.warn("⚠️ 資料格式錯誤，無法解析:", line, "解析結果:", values);
               }
 
             }
           }
+        } else {
+          console.log("⚠️ 收到空值 (value is null/undefined)");
         }
       }
     } catch (err) {
@@ -125,11 +138,29 @@ export const useSerialStore = defineStore('serial', () => {
     try {
       console.log("📤 傳送資料:", data);
       await writer!.write(data + '\n');
+      console.log("✅ 指令已送出");
 
       // 第一次 send 時啟動 readLoop（只會啟動一次，因為有 isReading 保護）
       if (!isReading) {
         readLoop();
       }
+
+      // 超時檢測：2 秒後檢查是否有收到回應
+      const timeoutMs = 2000;
+      const startTime = Date.now();
+      const initialDataState = JSON.stringify(receivedData.value);
+
+      setTimeout(() => {
+        const currentDataState = JSON.stringify(receivedData.value);
+        const elapsed = Date.now() - startTime;
+
+        if (currentDataState === initialDataState) {
+          console.log(`⏸️ 超時 (${elapsed}ms)：設備未回應「${data}」（這可能是正常的，設備可能不會對此指令回應）`);
+        } else {
+          console.log(`✅ 設備已回應 (${elapsed}ms 內)`);
+        }
+      }, timeoutMs);
+
     }
     catch (err) {
       console.error('寫入失敗:', err);
@@ -193,7 +224,7 @@ export const useSerialStore = defineStore('serial', () => {
 
       console.log("✅ 接口已安全關閉");
       isConnected.value = false;
-      ElMessage.success("🔌 接口連線已中斷");
+      ElMessage.success("接口連線已中斷");
     } catch (err) {
       console.error("❌ 斷線錯誤:", err);
     } finally {

@@ -52,6 +52,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
+import { ElLoading } from 'element-plus'
 import { useSerialStore } from '@/stores/serial';
 import { useFatigueStore } from '@/stores/fatigue';
 const serial = useSerialStore();
@@ -74,7 +75,16 @@ watch( // 監聽連線狀態變化
   () => serial.isConnected,
   (connected) => {
     if (connected) {
-      sendSerialPage(); // 如果有連線，傳送頁面為 0
+      const loading = ElLoading.service({
+        lock: true,
+        text: '等待設備連線初始化中...',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
+
+      setTimeout(() => {
+        sendSerialPage(); // 如果有連線，傳送頁面為 0
+        loading.close()
+      }, 1000);
     }
   }
 );
@@ -97,10 +107,6 @@ const sendSerialPage = async () => {
 }
 
 const sendSerialCount = async (no: number) => {
-  if(!serial.isConnected){
-    return;
-  }
-
   // 驗證 repeatCount 是否為有效數字
   const count = Number(repeatCount.value);
   if (isNaN(count) || count <= 0) {

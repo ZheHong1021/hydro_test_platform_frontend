@@ -30,6 +30,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch   } from 'vue'
+import { ElLoading } from 'element-plus'
 
 // //#region (Web Serial API 相關)
 import { useSerialStore } from '@/stores/serial';
@@ -41,7 +42,16 @@ watch( // 監聽連線狀態變化
   () => serial.isConnected,
   (connected) => {
     if (connected) {
-      sendSerialPage(); // 如果有連線，傳送頁面為 0
+      const loading = ElLoading.service({
+        lock: true,
+        text: '等待設備連線初始化中...',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
+
+      setTimeout(() => {
+        sendSerialPage(); // 如果有連線，傳送頁面為 0
+        loading.close()
+      }, 1000);
     }
   }
 );
@@ -70,9 +80,7 @@ const sendSerialPage = async () => {
 }
 
 const sendSerialButton = async (no: number) => {
-  if(serial.isConnected){
-    await serial.send(`SET_BUTTON,${no}`) // 如果有連線，設定按鈕指令
-  }
+  await serial.send(`SET_BUTTON,${no}`) // 如果有連線，設定按鈕指令
 }
 
 

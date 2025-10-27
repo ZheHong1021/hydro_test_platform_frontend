@@ -1,9 +1,5 @@
 <template>
   <div class="admin-home">
-    <div>
-      <h3>串口資料：</h3>
-      <pre>{{ serial.receivedData }}</pre>
-    </div>
       <el-row :gutter="20">
         <el-col :span="4"><div class="grid-content" />手動控制</el-col>
         <el-col :span="8"><div class="grid-content" />
@@ -51,7 +47,7 @@ watch( // 監聽連線狀態變化
       setTimeout(() => {
         sendSerialPage(); // 如果有連線，傳送頁面為 0
         loading.close()
-      }, 1000);
+      }, 3000);
     }
   }
 );
